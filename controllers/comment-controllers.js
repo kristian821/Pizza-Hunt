@@ -3,7 +3,6 @@ const { Comment, Piza, Pizza } = require('../models');
 const commentController = {
     // add Comment to Pizza
     addComment({ params, body }, res){
-        console.log(body);
         Comment.create(body)
         .then(({ _id }) => {
             return Pizza.findOneAndUpdate(
@@ -19,6 +18,25 @@ const commentController = {
             res.json(dbPizzaData);
         })
         .catch(err => res.json(err));
+    },
+
+    // add reply
+    addReply({ params, body }, res) {
+        Comment.findOneAndUpdate(
+            { _id: params.commentId },
+            { $push: { replies:  body } },
+            { new: true }
+        )
+        .then(dbPizzaData => {
+            if (!dbPizzaData) {
+                return res.status(404).json({ message: 'No pizza found with this id.'});
+            }
+            res.json(dbPizzaData);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).json(err);
+        });
     },
 
     // remove comment
@@ -37,6 +55,28 @@ const commentController = {
         .then(dbPizzaData => {
             if (!dbPizzaData) {
                return res.status(404).json({ message: 'No pizza found with this id.'});
+            }
+            res.json(dbPizzaData);
+        })
+        .catch(err => res.json(err));
+    },
+
+    // remove reply
+    removeReply({ params }, res) {
+        Comment.findOneAndDelete({ _id: params.commentId})
+        .then(deletedReply => {
+            if (!deletedReply) {
+                return res.status(404).json({ message: 'No reply found with this id.'});
+            }
+            return Pizza.findOneAndUpdate(
+                { _id: params.pizzaId },
+                { $pull: { replies: { replyId: params.replyId } } },
+                { new: true }
+            );
+        })
+        .then(dbPizzaData => {
+            if (!dbPizzaData) {
+                return res.status(404).json({ message: 'No pizza found with this id.'});
             }
             res.json(dbPizzaData);
         })

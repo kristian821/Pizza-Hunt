@@ -33,12 +33,12 @@ const CommentSchema = new Schema({
     commentBody: {
         type: String
     },
-    replies: [ReplySchema],
     createdAt: {
         type: Date,
         default: Date.now,
         get: createdAtVal => dateFormat(createdAtVal)
-    }
+    },
+    replies: [ReplySchema],
 },
 {
     toJSON: {

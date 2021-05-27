@@ -141,13 +141,34 @@ function handleNewReplySubmit(event) {
 
   const writtenBy = event.target.querySelector('[name=reply-name]').value;
   const replyBody = event.target.querySelector('[name=reply]').value;
+  
 
   if (!replyBody || !writtenBy) {
     return false;
-  }
+  } else {
+    const formData = { writtenBy, replyBody };
 
-  const formData = { writtenBy, replyBody };
-}
+    fetch(`/api/comments/${pizzaId}/${commentId}`, {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error ('Something went wrong');
+      }
+      response.json();
+    })
+    .then(replyResponse => {
+      console.log(replyResponse);
+      document.location.reload();
+    })
+    .catch(err => console.log(err));
+  };
+};
 
 $backBtn.addEventListener('click', function() {
   window.history.back();
