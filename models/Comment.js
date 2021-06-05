@@ -3,7 +3,7 @@ const dateFormat = require('../utils/dateFormat');
 
 const ReplySchema = new Schema(
     {
-        repoyId: {
+        replyId: {
             type: Schema.Types.ObjectId,
             default: () => new Types.ObjectId()
         },
